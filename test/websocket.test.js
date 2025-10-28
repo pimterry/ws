@@ -1365,7 +1365,7 @@ describe('WebSocket', () => {
       });
     });
 
-    it('fails if server sends no subprotocol', (done) => {
+    it('does not fail if server sends no subprotocol', (done) => {
       const wss = new WebSocket.Server({
         handleProtocols() {},
         server
@@ -1376,11 +1376,10 @@ describe('WebSocket', () => {
         'bar'
       ]);
 
-      ws.on('open', () => done(new Error("Unexpected 'open' event")));
-      ws.on('error', (err) => {
-        assert.ok(err instanceof Error);
-        assert.strictEqual(err.message, 'Server sent no subprotocol');
-        ws.on('close', () => wss.close(done));
+      ws.on('open', () => {
+        assert.strictEqual(ws.protocol, '');
+        ws.close();
+        wss.close(done);
       });
     });
 
